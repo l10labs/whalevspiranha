@@ -1,19 +1,19 @@
 /* 
- * PIRANHA UI - Brutalist Mobile-First Design
- * Theme: Black + Dark Green
- * Typography: Monospace
+ * PIRANHA UI - Brutalist Zen Design
+ * Theme: Light, Minimal, Calm
+ * Typography: System Sans
  */
 
 :root {
-  --black: #000000;
-  --green-dark: #0a1f0a;
-  --green-mid: #143d14;
-  --green-accent: #00ff41;
-  --green-dim: #0a3d0a;
-  --green-muted: #1a4d1a;
-  --green-text: #00cc33;
-  --green-subtle: #006622;
-  --white: #ffffff;
+  --bg: #f5f5f4;
+  --bg-elevated: #ffffff;
+  --border: #e5e5e4;
+  --border-strong: #d4d4d3;
+  --text-primary: #1c1c1c;
+  --text-secondary: #737373;
+  --text-muted: #a3a3a3;
+  --accent: #1c1c1c;
+  --accent-muted: #404040;
 }
 
 * {
@@ -22,9 +22,9 @@
 
 /* Container */
 .p-container {
-  background: var(--black);
-  color: var(--green-accent);
-  font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   min-height: 100vh;
   min-height: 100dvh;
   padding: 0;
@@ -39,29 +39,30 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--green-dim);
-  background: var(--black);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
 }
 
 .p-timer {
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 6px;
 }
 
 .p-timer-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--green-accent);
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--text-primary);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .p-timer-label {
   font-size: 10px;
-  color: var(--green-subtle);
-  letter-spacing: 1px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: lowercase;
 }
 
 .p-cycle {
@@ -72,15 +73,16 @@
 }
 
 .p-cycle-label {
-  font-size: 8px;
-  color: var(--green-subtle);
-  letter-spacing: 2px;
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: lowercase;
 }
 
 .p-cycle-value {
   font-size: 14px;
-  color: var(--green-text);
-  font-weight: 600;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .p-balance {
@@ -89,36 +91,36 @@
 
 .p-balance-value {
   font-size: 16px;
-  font-weight: 600;
-  color: var(--green-text);
+  font-weight: 500;
+  color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
 
 /* Progress Bar */
 .p-progress {
-  height: 3px;
-  background: var(--green-dark);
+  height: 2px;
+  background: var(--border);
   width: 100%;
 }
 
 .p-progress-fill {
   height: 100%;
-  background: var(--green-accent);
+  background: var(--text-primary);
   transition: width 0.1s linear;
-  box-shadow: 0 0 8px var(--green-accent);
 }
 
 /* Attack Input Section */
 .p-attack {
-  padding: 24px 16px 16px;
+  padding: 32px 20px 24px;
   text-align: center;
 }
 
 .p-attack-label {
-  font-size: 10px;
-  color: var(--green-subtle);
-  letter-spacing: 3px;
-  margin-bottom: 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+  text-transform: lowercase;
 }
 
 .p-attack-digits {
@@ -128,58 +130,59 @@
 }
 
 .p-digit {
-  width: 56px;
-  height: 72px;
-  border: 1px solid var(--green-dim);
+  width: 60px;
+  height: 76px;
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--green-dim);
-  background: var(--black);
-  transition: all 0.1s ease;
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  transition: all 0.15s ease;
 }
 
 .p-digit--active {
-  color: var(--green-accent);
-  border-color: var(--green-accent);
-  box-shadow: 0 0 12px rgba(0, 255, 65, 0.3);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+  background: var(--bg-elevated);
 }
 
 /* Number Pad */
 .p-pad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 16px;
-  max-width: 320px;
+  gap: 10px;
+  padding: 16px 20px;
+  max-width: 300px;
   margin: 0 auto;
 }
 
 .p-pad-btn {
   aspect-ratio: 1;
-  border: 1px solid var(--green-muted);
-  background: var(--black);
-  color: var(--green-text);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
   font-family: inherit;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.1s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .p-pad-btn:active:not(:disabled) {
-  background: var(--green-accent);
-  color: var(--black);
-  border-color: var(--green-accent);
+  background: var(--text-primary);
+  color: var(--bg-elevated);
+  border-color: var(--text-primary);
 }
 
 .p-pad-btn--used,
 .p-pad-btn:disabled {
-  color: var(--green-dark);
-  border-color: var(--green-dark);
+  color: var(--border);
+  border-color: var(--border);
+  background: var(--bg);
   cursor: default;
 }
 
@@ -187,68 +190,72 @@
 .p-actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 2fr;
-  gap: 8px;
-  padding: 8px 16px 16px;
+  gap: 10px;
+  padding: 8px 20px 20px;
 }
 
 .p-btn {
   padding: 14px 8px;
-  border: 1px solid var(--green-muted);
-  background: var(--black);
-  color: var(--green-text);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
   font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.1s ease;
   -webkit-tap-highlight-color: transparent;
+  text-transform: lowercase;
 }
 
 .p-btn--secondary {
-  color: var(--green-subtle);
-  border-color: var(--green-dark);
+  color: var(--text-muted);
+  border-color: var(--border);
 }
 
 .p-btn--secondary:active {
-  background: var(--green-dark);
-  color: var(--green-text);
+  background: var(--border);
+  color: var(--text-primary);
 }
 
 .p-btn--primary {
-  background: var(--green-accent);
-  color: var(--black);
-  border-color: var(--green-accent);
-  font-weight: 700;
+  background: var(--text-primary);
+  color: var(--bg-elevated);
+  border-color: var(--text-primary);
+  font-weight: 500;
 }
 
 .p-btn--primary:active:not(:disabled) {
-  background: var(--white);
-  border-color: var(--white);
+  background: var(--accent-muted);
+  border-color: var(--accent-muted);
 }
 
 .p-btn--primary:disabled {
-  background: var(--green-dark);
-  color: var(--green-dim);
-  border-color: var(--green-dark);
+  background: var(--border);
+  color: var(--text-muted);
+  border-color: var(--border);
   cursor: default;
 }
 
 /* Last Cycle Result */
 .p-last {
-  padding: 16px;
-  border-top: 1px solid var(--green-dark);
+  padding: 20px;
+  border-top: 1px solid var(--border);
   margin-top: auto;
+  background: var(--bg-elevated);
 }
 
 .p-last-header {
   margin-bottom: 12px;
+  text-align: center;
 }
 
 .p-last-label {
   font-size: 10px;
-  color: var(--green-subtle);
-  letter-spacing: 2px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: lowercase;
 }
 
 .p-last-digits {
@@ -260,61 +267,63 @@
 .p-last-digit {
   width: 44px;
   height: 52px;
-  border: 1px solid var(--green-muted);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--green-text);
-  background: var(--green-dark);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  background: var(--bg);
 }
 
 /* Combo Stats */
 .p-combos {
-  padding: 16px;
-  border-top: 1px solid var(--green-dark);
-  background: var(--black);
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .p-combos-label {
   font-size: 10px;
-  color: var(--green-subtle);
-  letter-spacing: 2px;
-  margin-bottom: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+  text-transform: lowercase;
 }
 
 .p-combos-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 .p-combo {
-  border: 1px solid var(--green-dark);
-  padding: 12px 8px;
+  border: 1px solid var(--border);
+  padding: 14px 8px;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  background: var(--bg-elevated);
 }
 
 .p-combo-type {
-  font-size: 11px;
-  color: var(--green-subtle);
-  font-weight: 600;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .p-combo-count {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--green-text);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .p-combo-reward {
   font-size: 9px;
-  color: var(--green-dim);
+  color: var(--text-muted);
 }
 
 /* Safe area for notched devices */
@@ -327,18 +336,18 @@
 /* Landscape orientation - compact layout */
 @media (orientation: landscape) and (max-height: 500px) {
   .p-attack {
-    padding: 12px 16px;
+    padding: 12px 20px;
   }
   
   .p-digit {
-    width: 44px;
+    width: 48px;
     height: 56px;
-    font-size: 28px;
+    font-size: 26px;
   }
   
   .p-pad {
-    padding: 8px 16px;
-    gap: 4px;
+    padding: 8px 20px;
+    gap: 6px;
   }
   
   .p-pad-btn {
@@ -346,27 +355,27 @@
   }
   
   .p-last {
-    padding: 12px 16px;
+    padding: 12px 20px;
   }
   
   .p-combos {
-    padding: 12px 16px;
+    padding: 12px 20px;
   }
 }
 
 /* Larger phones */
 @media (min-width: 414px) {
   .p-digit {
-    width: 64px;
-    height: 80px;
-    font-size: 40px;
+    width: 68px;
+    height: 84px;
+    font-size: 36px;
   }
   
   .p-pad {
-    max-width: 360px;
+    max-width: 340px;
   }
   
   .p-pad-btn {
-    font-size: 28px;
+    font-size: 26px;
   }
 }
