@@ -3,10 +3,10 @@
   color: #e0e0ff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   min-height: 100vh;
-  padding: 20px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 /* Header: Cycle + Timer */
@@ -14,8 +14,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 30px;
-  padding: 20px;
+  gap: 15px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(224, 224, 255, 0.15);
   border-radius: 8px;
@@ -38,7 +38,7 @@
 }
 
 .cycle-number {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 700;
   color: #6c5ce7;
 }
@@ -47,8 +47,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 300px;
+  gap: 4px;
+  min-width: 150px;
 }
 
 .timer-display {
@@ -77,32 +77,32 @@
 /* Player Balance */
 .balance-section {
   text-align: center;
-  padding: 20px;
+  padding: 10px 12px;
   background: rgba(108, 92, 231, 0.08);
   border: 1px solid rgba(108, 92, 231, 0.2);
   border-radius: 8px;
 }
 
 .balance-label {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   color: #a0a0d0;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .balance-value {
-  font-size: 36px;
+  font-size: 24px;
   font-weight: 700;
   color: #a29bfe;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 /* Main Content */
 .piranha-content {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
   flex: 1;
 }
@@ -112,8 +112,8 @@
   grid-column: 1;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  padding: 20px;
+  gap: 10px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(224, 224, 255, 0.15);
   border-radius: 8px;
@@ -121,20 +121,20 @@
 
 .input-display {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .input-digit {
-  width: 50px;
-  height: 50px;
+  width: 38px;
+  height: 38px;
   border: 2px solid rgba(162, 155, 254, 0.5);
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
   color: #a29bfe;
   background: rgba(108, 92, 231, 0.1);
@@ -149,8 +149,8 @@
 .number-pad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 10px 0;
+  gap: 6px;
+  margin: 6px 0;
 }
 
 .pad-button {
@@ -159,10 +159,11 @@
   border-radius: 6px;
   background: rgba(108, 92, 231, 0.15);
   color: #e0e0ff;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 4px;
 }
 
 .pad-button:hover:not(:disabled) {
@@ -184,18 +185,18 @@
 /* Control Buttons */
 .control-buttons {
   display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
 }
 
 .btn-randomize,
 .btn-attack {
-  padding: 12px 16px;
+  padding: 8px 10px;
   border: 1px solid rgba(224, 224, 255, 0.3);
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: uppercase;
@@ -214,7 +215,7 @@
 .btn-attack {
   background: rgba(108, 92, 231, 0.3);
   color: #a29bfe;
-  font-size: 13px;
+  font-size: 10px;
 }
 
 .btn-attack:hover:not(:disabled) {
@@ -230,12 +231,12 @@
 
 /* Clear Button */
 .btn-clear {
-  padding: 10px;
+  padding: 6px;
   border: 1px solid rgba(224, 224, 255, 0.2);
   border-radius: 6px;
   background: transparent;
   color: #a0a0d0;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -252,12 +253,13 @@
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  padding: 20px;
+  gap: 10px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(224, 224, 255, 0.15);
   border-radius: 8px;
   justify-content: flex-start;
+  grid-row: 1;
 }
 
 .section-label {
@@ -270,21 +272,21 @@
 
 .last-attack-display {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   justify-content: center;
   flex: 1;
   align-items: center;
 }
 
 .attack-digit {
-  width: 60px;
-  height: 60px;
+  width: 45px;
+  height: 45px;
   border: 2px solid rgba(162, 155, 254, 0.6);
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 700;
   color: #a29bfe;
   background: rgba(108, 92, 231, 0.15);
@@ -293,30 +295,31 @@
 
 /* Combo Stats Section */
 .combo-stats-section {
-  grid-column: 3;
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  padding: 20px;
+  gap: 10px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(224, 224, 255, 0.15);
   border-radius: 8px;
+  grid-row: 2;
 }
 
 .combo-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 8px;
 }
 
 .combo-card {
-  padding: 15px;
+  padding: 10px;
   background: rgba(108, 92, 231, 0.1);
   border: 1px solid rgba(108, 92, 231, 0.3);
   border-radius: 6px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   text-align: center;
   transition: all 0.2s ease;
 }
@@ -328,21 +331,21 @@
 }
 
 .combo-type {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 700;
   color: #a29bfe;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .combo-count {
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 700;
   color: #e0e0ff;
 }
 
 .combo-reward {
-  font-size: 11px;
+  font-size: 8px;
   color: #a0a0d0;
   font-weight: 600;
 }
@@ -363,27 +366,111 @@
 }
 
 @media (max-width: 768px) {
+  .piranha-container {
+    padding: 10px;
+    gap: 10px;
+  }
+
   .piranha-header {
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .balance-section {
+    padding: 8px 10px;
   }
 
   .balance-value {
-    font-size: 28px;
+    font-size: 20px;
+  }
+
+  .balance-label {
+    font-size: 8px;
+    margin-bottom: 3px;
   }
 
   .timer-section {
     min-width: auto;
     width: 100%;
+    gap: 3px;
   }
 
-  .combo-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .timer-display {
+    font-size: 12px;
+  }
+
+  .cycle-number {
+    font-size: 20px;
+  }
+
+  .attack-input-section,
+  .last-attack-section,
+  .combo-stats-section {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .input-digit {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .attack-digit {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  .pad-button {
+    font-size: 12px;
+  }
+
+  .btn-randomize,
+  .btn-attack {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+
+  .btn-clear {
+    padding: 5px;
+    font-size: 8px;
+  }
+
+  .section-label {
+    font-size: 9px;
+  }
+
+  .combo-card {
+    padding: 8px;
+    gap: 3px;
+  }
+
+  .combo-type {
+    font-size: 10px;
+  }
+
+  .combo-count {
+    font-size: 16px;
+  }
+
+  .combo-reward {
+    font-size: 7px;
   }
 }
 
 @media (max-width: 480px) {
-  .combo-grid {
-    grid-template-columns: 1fr;
+  .cycle-info {
+    min-width: 60px;
+    gap: 3px;
+  }
+
+  .cycle-label {
+    font-size: 8px;
+  }
+
+  .cycle-number {
+    font-size: 18px;
   }
 }
