@@ -1,21 +1,32 @@
-// import { useState } from 'react'
-// import { Design1 } from './Design1'
-// import { Design2 } from './Design2'
-// import { Design3 } from './Design3'
-// import { Design4 } from './Design4'
-// import { Design5 } from './Design5'
-// import { Design6 } from './Design6'
-// import { Design7 } from './Design7'
+import { useState } from 'react'
 import { PiranhaUI } from './PiranhaUI'
+import { WhaleUI } from './WhaleUI'
 import './App.css'
 
+type PlayerRole = 'piranha' | 'whale'
+
 function App() {
+  const [activeRole, setActiveRole] = useState<PlayerRole>('piranha')
 
   return (
     <div className="app-wrapper">
-        <div className="app-content">
-          {<PiranhaUI />}
-        </div>
+      <nav className="app-tabs">
+        <button 
+          className={`tab tab--piranha ${activeRole === 'piranha' ? 'active' : ''}`}
+          onClick={() => setActiveRole('piranha')}
+        >
+          PIRANHA
+        </button>
+        <button 
+          className={`tab tab--whale ${activeRole === 'whale' ? 'active' : ''}`}
+          onClick={() => setActiveRole('whale')}
+        >
+          WHALE
+        </button>
+      </nav>
+      <div className="app-content">
+        {activeRole === 'piranha' ? <PiranhaUI /> : <WhaleUI />}
+      </div>
     </div>
   )
 }
