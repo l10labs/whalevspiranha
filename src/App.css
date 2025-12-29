@@ -7,15 +7,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #0a0a1a;
+  background: #0a0a0a;
 }
 
 .app-tabs {
   display: flex;
   justify-content: center;
   gap: 0;
-  background: #0d0d1d;
-  border-bottom: 3px solid #2a2a5a;
+  background: #000000;
+  border-bottom: 3px solid #333333;
   flex-shrink: 0;
 }
 
@@ -24,8 +24,8 @@
   max-width: 180px;
   padding: 10px 20px;
   border: none;
-  background: #12122a;
-  color: #606090;
+  background: #1a1a1a;
+  color: #404040;
   font-family: 'Press Start 2P', monospace;
   font-size: 9px;
   letter-spacing: 2px;
@@ -35,25 +35,25 @@
 }
 
 .tab--piranha {
-  border-right: 2px solid #2a2a5a;
+  border-right: 2px solid #333333;
 }
 
 .tab--piranha.active {
-  background: #1a1a2a;
-  color: #ff3366;
-  border-bottom: 3px solid #ff3366;
-  text-shadow: 0 0 8px #ff3366;
+  background: #1a1a1a;
+  color: #ff0033;
+  border-bottom: 3px solid #ff0033;
+  text-shadow: 0 0 10px #ff0033;
 }
 
 .tab--whale {
-  border-left: 2px solid #2a2a5a;
+  border-left: 2px solid #333333;
 }
 
 .tab--whale.active {
-  background: #0d1a2a;
-  color: #00aaff;
-  border-bottom: 3px solid #00aaff;
-  text-shadow: 0 0 8px #00aaff;
+  background: #1a1a1a;
+  color: #0066ff;
+  border-bottom: 3px solid #0066ff;
+  text-shadow: 0 0 10px #0066ff;
 }
 
 .app-content {
