@@ -1,34 +1,49 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Design1 } from './Design1'
+import { Design2 } from './Design2'
+import { Design3 } from './Design3'
+import { Design4 } from './Design4'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeDesign, setActiveDesign] = useState<1 | 2 | 3 | 4>(1)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="app-wrapper">
+      <div className="app-tabs">
+        <button
+          className={`tab ${activeDesign === 1 ? 'active' : ''}`}
+          onClick={() => setActiveDesign(1)}
+        >
+          Neon Futuristic
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <button
+          className={`tab ${activeDesign === 2 ? 'active' : ''}`}
+          onClick={() => setActiveDesign(2)}
+        >
+          Minimalist
+        </button>
+        <button
+          className={`tab ${activeDesign === 3 ? 'active' : ''}`}
+          onClick={() => setActiveDesign(3)}
+        >
+          Gaming Dashboard
+        </button>
+        <button
+          className={`tab ${activeDesign === 4 ? 'active' : ''}`}
+          onClick={() => setActiveDesign(4)}
+        >
+          Brutalist
+        </button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      <div className="app-content">
+        {activeDesign === 1 && <Design1 />}
+        {activeDesign === 2 && <Design2 />}
+        {activeDesign === 3 && <Design3 />}
+        {activeDesign === 4 && <Design4 />}
+      </div>
+    </div>
   )
 }
 
