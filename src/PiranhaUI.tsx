@@ -93,8 +93,6 @@ export function PiranhaUI() {
         attackDisabled={attackInput.length !== 4}
       />
       
-      <div className="flex-spacer" />
-      
       <DigitDisplay
         label="LAST CRIT"
         digits={lastCritAttack}
