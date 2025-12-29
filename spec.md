@@ -52,12 +52,15 @@ Example: Crit attack = "2345"
 ## Attack Limits
 
 ### Permutation Cap
-- Maximum attacks per permutation per cycle: 10 per $100k deposited
-- Formula: `(whale_reserve / 100,000) * 10`
+- Maximum attacks per permutation per cycle: Step function
+- Increments by 10 for every $100k deposited
+- Formula: `floor(whale_reserve / 100,000) * 10`
 
 Examples:
-- $100k reserve = 10 max per permutation
-- $500k reserve = 50 max per permutation
+- $100k-$199k reserve = 10 max per permutation
+- $200k-$299k reserve = 20 max per permutation
+- $300k-$399k reserve = 30 max per permutation
+- $500k-$599k reserve = 50 max per permutation
 
 ## Game State
 
