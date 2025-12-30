@@ -6,12 +6,12 @@ A PvP lottery-style game where whales deposit large reserves and piranhas attack
 ## Players
 
 ### Whales
-- Minimum deposit: $100,000
+- Minimum deposit: $1,000
 - Fund the game reserve
 - Single whale deposit starts the game
 
 ### Piranhas
-- Cost per attack: $10
+- Cost per attack: $0.10
 - Submit 4-digit non-repeating attacks
 - Each digit: 1-9 inclusive
 
@@ -36,31 +36,31 @@ A PvP lottery-style game where whales deposit large reserves and piranhas attack
 ### Combo System
 Combos awarded for matching crit attack from left to right:
 
-| Combo Type | Digits Matching | Reward |
-|------------|----------------|--------|
-| 1x         | First digit    | $10    |
-| 2x         | First 2 digits | $50    |
-| 3x         | First 3 digits | $500   |
-| 4x         | All 4 digits   | $5,000 |
+| Combo Type | Digits Matching | Multiplier | Reward |
+|------------|-----------------|------------|--------|
+| 1x         | First digit     | 1x         | $0.10  |
+| 2x         | First 2 digits  | 10x        | $1.00  |
+| 3x         | First 3 digits  | 100x       | $10.00 |
+| 4x         | All 4 digits    | 1000x      | $100.00|
 
 Example: Crit attack = "2345"
-- Piranha attack "2345" = 4x combo ($5,000)
-- Piranha attack "2349" = 3x combo ($500)
-- Piranha attack "2395" = 2x combo ($50)
-- Piranha attack "2987" = 1x combo ($10)
+- Piranha attack "2345" = 4x combo (1000x = $100.00)
+- Piranha attack "2349" = 3x combo (100x = $10.00)
+- Piranha attack "2395" = 2x combo (10x = $1.00)
+- Piranha attack "2987" = 1x combo (1x = $0.10)
 
 ## Attack Limits
 
 ### Permutation Cap
 - Maximum attacks per permutation per cycle: Step function
-- Increments by 10 for every $100k deposited
-- Formula: `floor(whale_reserve / 100,000) * 10`
+- Increments by 10 for every $1,000 deposited
+- Formula: `floor(whale_reserve / 1,000) * 10`
 
 Examples:
-- $100k-$199k reserve = 10 max per permutation
-- $200k-$299k reserve = 20 max per permutation
-- $300k-$399k reserve = 30 max per permutation
-- $500k-$599k reserve = 50 max per permutation
+- $1,000-$1,999 reserve = 10 max per permutation
+- $2,000-$2,999 reserve = 20 max per permutation
+- $3,000-$3,999 reserve = 30 max per permutation
+- $5,000-$5,999 reserve = 50 max per permutation
 
 ## Game State
 
