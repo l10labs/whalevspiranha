@@ -135,35 +135,42 @@ def calculate_cycle_economics(reserve):
     }
 
 
-def calculate_worst_case_payout(num_attacks):
+def calculate_worst_case_payout(num_attacks, reserve):
     """
     Calculate worst-case payout for the whale assuming piranhas always
     hit the best possible combos.
 
     Priority order (best for piranhas): 4x, 3x, 2x, 1x, 0x
+
+    Each permutation can be attacked up to `cap` times based on reserve.
     """
     counts = calculate_combo_counts()
+    cap = calculate_permutation_cap(reserve)
 
     remaining_attacks = num_attacks
     payout = 0.0
 
-    # 4x combos first (1 available)
-    hits_4x = min(remaining_attacks, counts["4x"])
+    # 4x combos first (1 permutation × cap attacks each)
+    max_4x_attacks = counts["4x"] * cap
+    hits_4x = min(remaining_attacks, max_4x_attacks)
     payout += hits_4x * COMBO_4X_MULTIPLIER * ATTACK_COST
     remaining_attacks -= hits_4x
 
-    # 3x combos next (5 available)
-    hits_3x = min(remaining_attacks, counts["3x"])
+    # 3x combos next (5 permutations × cap attacks each)
+    max_3x_attacks = counts["3x"] * cap
+    hits_3x = min(remaining_attacks, max_3x_attacks)
     payout += hits_3x * COMBO_3X_MULTIPLIER * ATTACK_COST
     remaining_attacks -= hits_3x
 
-    # 2x combos next (36 available)
-    hits_2x = min(remaining_attacks, counts["2x"])
+    # 2x combos next (36 permutations × cap attacks each)
+    max_2x_attacks = counts["2x"] * cap
+    hits_2x = min(remaining_attacks, max_2x_attacks)
     payout += hits_2x * COMBO_2X_MULTIPLIER * ATTACK_COST
     remaining_attacks -= hits_2x
 
-    # 1x combos next (294 available)
-    hits_1x = min(remaining_attacks, counts["1x"])
+    # 1x combos next (294 permutations × cap attacks each)
+    max_1x_attacks = counts["1x"] * cap
+    hits_1x = min(remaining_attacks, max_1x_attacks)
     payout += hits_1x * COMBO_1X_MULTIPLIER * ATTACK_COST
     remaining_attacks -= hits_1x
 
@@ -172,10 +179,10 @@ def calculate_worst_case_payout(num_attacks):
     return payout
 
 
-def calculate_worst_case_economics(num_attacks):
+def calculate_worst_case_economics(num_attacks, reserve):
     """Calculate economics for worst-case scenario with given number of attacks."""
     revenue = num_attacks * ATTACK_COST
-    payout = calculate_worst_case_payout(num_attacks)
+    payout = calculate_worst_case_payout(num_attacks, reserve)
     profit = revenue - payout
 
     return {
@@ -279,14 +286,15 @@ def main():
     total_perms = calculate_total_permutations()
     max_attacks = calculate_max_attacks(WHALE_RESERVE)
 
-    # Key thresholds where combo tiers are exhausted
-    threshold_4x = counts["4x"]  # 1
-    threshold_3x = threshold_4x + counts["3x"]  # 6
-    threshold_2x = threshold_3x + counts["2x"]  # 42
-    threshold_1x = threshold_2x + counts["1x"]  # 336
+    # Key thresholds where combo tiers are exhausted (accounting for cap)
+    cap = calculate_permutation_cap(WHALE_RESERVE)
+    threshold_4x = counts["4x"] * cap  # 1 * 5 = 5
+    threshold_3x = threshold_4x + counts["3x"] * cap  # 5 + 5*5 = 30
+    threshold_2x = threshold_3x + counts["2x"] * cap  # 30 + 36*5 = 210
+    threshold_1x = threshold_2x + counts["1x"] * cap  # 210 + 294*5 = 1680
 
     # Calculate breakeven
-    max_payout = calculate_worst_case_payout(threshold_1x)
+    max_payout = calculate_worst_case_payout(threshold_1x, WHALE_RESERVE)
     breakeven = int(max_payout / ATTACK_COST)
 
     print(f"\n🦈 WORST CASE SCENARIO (Piranhas always hit best combos)")
@@ -312,7 +320,7 @@ def main():
     attack_counts = sorted(set(attack_counts + key_thresholds))
 
     for num_attacks in attack_counts:
-        econ = calculate_worst_case_economics(num_attacks)
+        econ = calculate_worst_case_economics(num_attacks, WHALE_RESERVE)
 
         # Add marker for key thresholds
         marker = ""
@@ -338,10 +346,10 @@ def main():
         f"Attacks to exhaust 4x combos: {threshold_4x} (payout: ${counts['4x'] * COMBO_4X_MULTIPLIER * ATTACK_COST:,.2f})"
     )
     print(
-        f"Attacks to exhaust 3x combos: {threshold_3x} (payout: ${calculate_worst_case_payout(threshold_3x):,.2f})"
+        f"Attacks to exhaust 3x combos: {threshold_3x} (payout: ${calculate_worst_case_payout(threshold_3x, WHALE_RESERVE):,.2f})"
     )
     print(
-        f"Attacks to exhaust 2x combos: {threshold_2x} (payout: ${calculate_worst_case_payout(threshold_2x):,.2f})"
+        f"Attacks to exhaust 2x combos: {threshold_2x} (payout: ${calculate_worst_case_payout(threshold_2x, WHALE_RESERVE):,.2f})"
     )
     print(f"Attacks to exhaust 1x combos: {threshold_1x} (payout: ${max_payout:,.2f})")
     print(f"\nBreakeven point: {breakeven:,} attacks")
@@ -350,7 +358,7 @@ def main():
     )
 
     # Final summary
-    econ_max = calculate_worst_case_economics(max_attacks)
+    econ_max = calculate_worst_case_economics(max_attacks, WHALE_RESERVE)
     print(f"\nAt max attacks ({max_attacks:,}):")
     print(f"  Revenue: ${econ_max['revenue']:,.2f}")
     print(f"  Payout:  ${econ_max['payout']:,.2f}")
