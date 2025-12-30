@@ -1,9 +1,11 @@
 import random
+from itertools import permutations
 
 # Constants
 ATTACK_COST = 0.10
 STARTING_BANKROLL = 100.00
 ATTACKS_PER_SESSION = int(STARTING_BANKROLL / ATTACK_COST)  # 1000 attacks
+MAX_ATTACKS_PER_PERM = 10
 
 PAYOUTS = {
     0: 0.00,  # miss
@@ -12,6 +14,10 @@ PAYOUTS = {
     3: 10.00,  # 100x
     4: 100.00,  # 1000x
 }
+
+# All valid permutations
+ALL_PERMS = list(permutations(range(1, 10), 4))
+TOTAL_PERMS = len(ALL_PERMS)  # 3024
 
 
 def generate_crit():
@@ -78,6 +84,45 @@ def run_multiplayer_session(num_piranhas_per_cycle):
 
     return [
         (piranha_winnings[p], piranha_combos[p]) for p in range(num_piranhas_per_cycle)
+    ]
+
+
+def run_capped_multiplayer_session(num_piranhas_per_cycle):
+    """
+    Simulate multiple piranhas playing together with permutation cap enforced.
+    Each piranha plays 1 attack per cycle, same crit for all in that cycle.
+    Max 10 attacks allowed per permutation per cycle.
+    Each piranha plays 1000 cycles (spending $100 total).
+    Returns: list of (total_winnings, combo_counts, rejected_count) per piranha
+    """
+    # Track each piranha's results
+    piranha_winnings = [0.0] * num_piranhas_per_cycle
+    piranha_combos = [
+        {0: 0, 1: 0, 2: 0, 3: 0, 4: 0} for _ in range(num_piranhas_per_cycle)
+    ]
+    piranha_rejected = [0] * num_piranhas_per_cycle
+
+    for _ in range(ATTACKS_PER_SESSION):
+        crit = generate_crit()
+        perm_counts = {}  # Track attacks per permutation this cycle
+
+        for p in range(num_piranhas_per_cycle):
+            attack = generate_attack()
+
+            # Check if this permutation is already at cap
+            if perm_counts.get(attack, 0) >= MAX_ATTACKS_PER_PERM:
+                # Attack rejected - piranha loses their $0.10, no payout
+                piranha_rejected[p] += 1
+            else:
+                # Attack accepted
+                perm_counts[attack] = perm_counts.get(attack, 0) + 1
+                combo = calculate_combo(attack, crit)
+                piranha_combos[p][combo] += 1
+                piranha_winnings[p] += PAYOUTS[combo]
+
+    return [
+        (piranha_winnings[p], piranha_combos[p], piranha_rejected[p])
+        for p in range(num_piranhas_per_cycle)
     ]
 
 
@@ -245,5 +290,91 @@ def run_player_count_comparison():
         )
 
 
+def run_capped_multiplayer_simulation(num_piranhas_per_cycle, num_sessions=10000):
+    """
+    Run multiple sessions with permutation cap enforced.
+    """
+    sessions_to_run = max(1, num_sessions // num_piranhas_per_cycle)
+    results = []
+    total_combos = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0}
+    total_rejected = 0
+
+    for _ in range(sessions_to_run):
+        session_results = run_capped_multiplayer_session(num_piranhas_per_cycle)
+
+        for winnings, combo_counts, rejected in session_results:
+            net_profit = winnings - STARTING_BANKROLL
+            results.append(
+                {
+                    "winnings": winnings,
+                    "net_profit": net_profit,
+                    "rejected": rejected,
+                }
+            )
+            for combo, count in combo_counts.items():
+                total_combos[combo] += count
+            total_rejected += rejected
+
+    return results, total_combos, total_rejected
+
+
+def print_capped_compact_results(results):
+    """Print compact results for capped comparison table."""
+    profits = [r["net_profit"] for r in results]
+    rejected = [r["rejected"] for r in results]
+    num_results = len(results)
+
+    avg_profit = sum(profits) / num_results
+    min_profit = min(profits)
+    max_profit = max(profits)
+
+    variance = sum((p - avg_profit) ** 2 for p in profits) / num_results
+    std_dev = variance**0.5
+
+    winners = sum(1 for p in profits if p > 0)
+    win_pct = (winners / num_results) * 100
+
+    sorted_profits = sorted(profits)
+    median = sorted_profits[int(num_results * 0.50)]
+
+    avg_rejected = sum(rejected) / num_results
+    reject_pct = (avg_rejected / ATTACKS_PER_SESSION) * 100
+
+    return {
+        "avg_profit": avg_profit,
+        "median": median,
+        "min": min_profit,
+        "max": max_profit,
+        "std_dev": std_dev,
+        "win_pct": win_pct,
+        "avg_rejected": avg_rejected,
+        "reject_pct": reject_pct,
+    }
+
+
+def run_capped_player_comparison():
+    """Compare results across different player counts with cap enforced."""
+    print("=" * 105)
+    print("PIRANHA SIMULATION - CAPPED (10 attacks/permutation)")
+    print("=" * 105)
+    print(f"\nEach piranha: $100 bankroll, 1000 attacks, $0.10/attack")
+    print(f"Max 10 attacks per permutation per cycle (3024 total permutations)")
+    print(f"Simulating ~10,000 piranha sessions per player count...\n")
+
+    header = f"{'Players':<10} {'Avg Profit':<12} {'Median':<12} {'Min':<12} {'Max':<12} {'Std Dev':<12} {'Win %':<10} {'Rejected %':<10}"
+    print(header)
+    print("-" * 105)
+
+    player_counts = [100, 500, 1000, 1500, 2000, 2500, 3000]
+
+    for count in player_counts:
+        print(f"Running {count} players...", end=" ", flush=True)
+        results, _, _ = run_capped_multiplayer_simulation(count, num_sessions=10000)
+        stats = print_capped_compact_results(results)
+        print(
+            f"\r{count:<10} ${stats['avg_profit']:<11.2f} ${stats['median']:<11.2f} ${stats['min']:<11.2f} ${stats['max']:<11.2f} ${stats['std_dev']:<11.2f} {stats['win_pct']:<9.2f}% {stats['reject_pct']:.2f}%"
+        )
+
+
 if __name__ == "__main__":
-    run_player_count_comparison()
+    run_capped_player_comparison()
