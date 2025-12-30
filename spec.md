@@ -26,6 +26,12 @@ A PvP lottery-style game where whales deposit large reserves and piranhas attack
 2. **End of cycle**: Random 4-digit crit attack generated
 3. **Evaluation**: Matching attacks receive combo rewards
 
+### Revenue & Payout Timing
+- **Revenue**: Attack fees ($0.10 per attack) added to whale reserve first
+- **Payouts**: Then deducted from whale reserve
+
+Both occur in the same cycle, with revenue applied before payouts.
+
 ## Attack Rules
 
 ### Attack Format
@@ -53,14 +59,14 @@ Example: Crit attack = "2345"
 
 ### Permutation Cap
 - Maximum attacks per permutation per cycle: Step function
-- Increments by 10 for every $1,000 deposited
-- Formula: `floor(whale_reserve / 1,000) * 10`
+- Increments by 5 for every $1,000 deposited
+- Formula: `floor(whale_reserve / 1,000) * 5`
 
 Examples:
-- $1,000-$1,999 reserve = 10 max per permutation
-- $2,000-$2,999 reserve = 20 max per permutation
-- $3,000-$3,999 reserve = 30 max per permutation
-- $5,000-$5,999 reserve = 50 max per permutation
+- $1,000-$1,999 reserve = 5 max per permutation
+- $2,000-$2,999 reserve = 10 max per permutation
+- $3,000-$3,999 reserve = 15 max per permutation
+- $5,000-$5,999 reserve = 25 max per permutation
 
 ## Game State
 
