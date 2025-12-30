@@ -135,6 +135,58 @@ def calculate_cycle_economics(reserve):
     }
 
 
+def calculate_worst_case_payout(num_attacks):
+    """
+    Calculate worst-case payout for the whale assuming piranhas always
+    hit the best possible combos.
+
+    Priority order (best for piranhas): 4x, 3x, 2x, 1x, 0x
+    """
+    counts = calculate_combo_counts()
+
+    remaining_attacks = num_attacks
+    payout = 0.0
+
+    # 4x combos first (1 available)
+    hits_4x = min(remaining_attacks, counts["4x"])
+    payout += hits_4x * COMBO_4X_MULTIPLIER * ATTACK_COST
+    remaining_attacks -= hits_4x
+
+    # 3x combos next (5 available)
+    hits_3x = min(remaining_attacks, counts["3x"])
+    payout += hits_3x * COMBO_3X_MULTIPLIER * ATTACK_COST
+    remaining_attacks -= hits_3x
+
+    # 2x combos next (36 available)
+    hits_2x = min(remaining_attacks, counts["2x"])
+    payout += hits_2x * COMBO_2X_MULTIPLIER * ATTACK_COST
+    remaining_attacks -= hits_2x
+
+    # 1x combos next (294 available)
+    hits_1x = min(remaining_attacks, counts["1x"])
+    payout += hits_1x * COMBO_1X_MULTIPLIER * ATTACK_COST
+    remaining_attacks -= hits_1x
+
+    # 0x combos (no payout, remaining attacks are losers)
+
+    return payout
+
+
+def calculate_worst_case_economics(num_attacks):
+    """Calculate economics for worst-case scenario with given number of attacks."""
+    revenue = num_attacks * ATTACK_COST
+    payout = calculate_worst_case_payout(num_attacks)
+    profit = revenue - payout
+
+    return {
+        "num_attacks": num_attacks,
+        "revenue": revenue,
+        "payout": payout,
+        "profit": profit,
+        "profit_margin": (profit / revenue * 100) if revenue > 0 else 0,
+    }
+
+
 def main():
     print("=" * 60)
     print("WHALE VS PIRANHA - GAME ECONOMICS CALCULATOR")
@@ -221,6 +273,88 @@ def main():
         print(
             f"${reserve:>10,} {econ['max_attacks']:>14,} ${econ['revenue']:>12,.2f} ${econ['total_payout']:>12,.2f} ${econ['profit']:>12,.2f}"
         )
+
+    # Worst case scenario analysis
+    counts = calculate_combo_counts()
+    total_perms = calculate_total_permutations()
+    max_attacks = calculate_max_attacks(WHALE_RESERVE)
+
+    # Key thresholds where combo tiers are exhausted
+    threshold_4x = counts["4x"]  # 1
+    threshold_3x = threshold_4x + counts["3x"]  # 6
+    threshold_2x = threshold_3x + counts["2x"]  # 42
+    threshold_1x = threshold_2x + counts["1x"]  # 336
+
+    # Calculate breakeven
+    max_payout = calculate_worst_case_payout(threshold_1x)
+    breakeven = int(max_payout / ATTACK_COST)
+
+    print(f"\n🦈 WORST CASE SCENARIO (Piranhas always hit best combos)")
+    print("-" * 80)
+    print(
+        f"{'Attacks':>10} {'Revenue':>12} {'Payout':>12} {'Profit':>12} {'Margin':>10}"
+    )
+    print("-" * 80)
+
+    # Generate attack counts: 1, 10, 20, 30, ... up to max
+    attack_counts = [1]
+    current = 10
+    while current <= max_attacks:
+        attack_counts.append(current)
+        current += 10
+
+    # Add max if not already included
+    if attack_counts[-1] != max_attacks:
+        attack_counts.append(max_attacks)
+
+    # Also ensure key thresholds are included
+    key_thresholds = [threshold_4x, threshold_3x, threshold_2x, threshold_1x, breakeven]
+    attack_counts = sorted(set(attack_counts + key_thresholds))
+
+    for num_attacks in attack_counts:
+        econ = calculate_worst_case_economics(num_attacks)
+
+        # Add marker for key thresholds
+        marker = ""
+        if num_attacks == threshold_4x:
+            marker = " <- all 4x hit"
+        elif num_attacks == threshold_3x:
+            marker = " <- all 3x hit"
+        elif num_attacks == threshold_2x:
+            marker = " <- all 2x hit"
+        elif num_attacks == threshold_1x:
+            marker = " <- all paying combos hit"
+        elif num_attacks == breakeven:
+            marker = " <- BREAKEVEN"
+
+        print(
+            f"{econ['num_attacks']:>10,} ${econ['revenue']:>10,.2f} ${econ['payout']:>10,.2f} ${econ['profit']:>+11,.2f} {econ['profit_margin']:>+9.2f}%{marker}"
+        )
+
+    # Show key thresholds summary
+    print(f"\n📍 KEY THRESHOLDS SUMMARY")
+    print("-" * 50)
+    print(
+        f"Attacks to exhaust 4x combos: {threshold_4x} (payout: ${counts['4x'] * COMBO_4X_MULTIPLIER * ATTACK_COST:,.2f})"
+    )
+    print(
+        f"Attacks to exhaust 3x combos: {threshold_3x} (payout: ${calculate_worst_case_payout(threshold_3x):,.2f})"
+    )
+    print(
+        f"Attacks to exhaust 2x combos: {threshold_2x} (payout: ${calculate_worst_case_payout(threshold_2x):,.2f})"
+    )
+    print(f"Attacks to exhaust 1x combos: {threshold_1x} (payout: ${max_payout:,.2f})")
+    print(f"\nBreakeven point: {breakeven:,} attacks")
+    print(
+        f"  At {breakeven} attacks: revenue = ${breakeven * ATTACK_COST:,.2f}, payout = ${max_payout:,.2f}"
+    )
+
+    # Final summary
+    econ_max = calculate_worst_case_economics(max_attacks)
+    print(f"\nAt max attacks ({max_attacks:,}):")
+    print(f"  Revenue: ${econ_max['revenue']:,.2f}")
+    print(f"  Payout:  ${econ_max['payout']:,.2f}")
+    print(f"  Profit:  ${econ_max['profit']:+,.2f} ({econ_max['profit_margin']:+.2f}%)")
 
 
 if __name__ == "__main__":
