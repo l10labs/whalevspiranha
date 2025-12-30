@@ -66,9 +66,9 @@ def main():
     print(f"\n{'Attacks':>10} {'P(all combos hit)':>20} {'Odds'}")
     print("-" * 70)
 
-    # Generate attack counts: 100, 200, 300, ... up to 3024
-    attack_counts = list(range(100, TOTAL_PERMUTATIONS, 100))
-    attack_counts.append(TOTAL_PERMUTATIONS)  # Include max
+    # Generate attack counts: 100, 200, 300, ... up to 2900, then every single number from 3000+
+    attack_counts = list(range(100, 3000, 100))
+    attack_counts.extend(range(3000, TOTAL_PERMUTATIONS + 1))
 
     for n in attack_counts:
         prob = prob_all_paying_combos_hit(n)
