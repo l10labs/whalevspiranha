@@ -376,5 +376,97 @@ def run_capped_player_comparison():
         )
 
 
+def run_high_volume_cycle(num_attacks):
+    """
+    Simulate a single cycle with many attacks, respecting the cap.
+    Returns per-attack results (not per-piranha sessions).
+    """
+    crit = generate_crit()
+    perm_counts = {}
+
+    results = []
+    total_rejected = 0
+    combo_counts = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0}
+    total_winnings = 0
+
+    for _ in range(num_attacks):
+        attack = generate_attack()
+
+        if perm_counts.get(attack, 0) >= MAX_ATTACKS_PER_PERM:
+            # Rejected - still costs $0.10, no payout
+            total_rejected += 1
+        else:
+            perm_counts[attack] = perm_counts.get(attack, 0) + 1
+            combo = calculate_combo(attack, crit)
+            combo_counts[combo] += 1
+            total_winnings += PAYOUTS[combo]
+
+    revenue = num_attacks * ATTACK_COST
+
+    return {
+        "revenue": revenue,
+        "winnings": total_winnings,
+        "net_profit": total_winnings - revenue,
+        "rejected": total_rejected,
+        "combo_counts": combo_counts,
+    }
+
+
+def run_high_volume_simulation(num_attacks_per_cycle, num_cycles=1000):
+    """Run many cycles with high attack volume."""
+    results = []
+    total_combos = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0}
+    total_rejected = 0
+
+    for _ in range(num_cycles):
+        cycle_result = run_high_volume_cycle(num_attacks_per_cycle)
+        results.append(cycle_result)
+        total_rejected += cycle_result["rejected"]
+        for combo, count in cycle_result["combo_counts"].items():
+            total_combos[combo] += count
+
+    return results, total_combos, total_rejected
+
+
+def run_high_volume_comparison():
+    """Compare results across different attack volumes per cycle."""
+    print("=" * 110)
+    print("HIGH VOLUME SIMULATION - ATTACKS PER CYCLE (with 10/perm cap)")
+    print("=" * 110)
+    print(f"\nMax capacity: 3024 perms x 10 attacks = 30,240 attacks/cycle")
+    print(f"Running 1000 cycles per attack volume...\n")
+
+    header = f"{'Attacks':<10} {'Avg Piranha P/L':<18} {'Whale Profit':<15} {'Whale Margin':<15} {'Rejected %':<12} {'Accepted':<10}"
+    print(header)
+    print("-" * 110)
+
+    attack_counts = [10000, 20000, 30000]
+
+    for num_attacks in attack_counts:
+        print(f"Running {num_attacks:,} attacks/cycle...", end=" ", flush=True)
+        results, total_combos, total_rejected = run_high_volume_simulation(
+            num_attacks, num_cycles=1000
+        )
+
+        # Calculate averages
+        avg_revenue = sum(r["revenue"] for r in results) / len(results)
+        avg_winnings = sum(r["winnings"] for r in results) / len(results)
+        avg_rejected = total_rejected / len(results)
+        avg_accepted = num_attacks - avg_rejected
+
+        # Piranha perspective (per attack)
+        piranha_pl_per_attack = (avg_winnings - avg_revenue) / num_attacks
+
+        # Whale perspective
+        whale_profit = avg_revenue - avg_winnings
+        whale_margin = (whale_profit / avg_revenue) * 100 if avg_revenue > 0 else 0
+
+        reject_pct = (avg_rejected / num_attacks) * 100
+
+        print(
+            f"\r{num_attacks:<10,} ${piranha_pl_per_attack:<17.4f} ${whale_profit:<14,.2f} {whale_margin:<14.2f}% {reject_pct:<11.2f}% {avg_accepted:<,.0f}"
+        )
+
+
 if __name__ == "__main__":
-    run_capped_player_comparison()
+    run_high_volume_comparison()
