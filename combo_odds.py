@@ -63,24 +63,12 @@ def main():
 
     print(f"\nMinimum attacks to hit all paying combos: {TOTAL_PAYING}")
 
-    breakeven = 10770
-
     print(f"\n{'Attacks':>10} {'P(all combos hit)':>20} {'Odds'}")
     print("-" * 70)
 
-    # Key attack counts to check
-    attack_counts = [
-        336,  # minimum possible
-        400,
-        500,
-        750,
-        1000,
-        1500,
-        2000,
-        2500,
-        3000,
-        3024,  # all permutations (1 cap layer)
-    ]
+    # Generate attack counts: 100, 200, 300, ... up to 3024
+    attack_counts = list(range(100, TOTAL_PERMUTATIONS, 100))
+    attack_counts.append(TOTAL_PERMUTATIONS)  # Include max
 
     for n in attack_counts:
         prob = prob_all_paying_combos_hit(n)
@@ -97,12 +85,13 @@ def main():
             odds_str = f"1 in {1 / prob:,.0f}"
 
         marker = ""
-        if n == TOTAL_PAYING:
-            marker = " <- minimum"
-        elif n == TOTAL_PERMUTATIONS:
+        if n == TOTAL_PERMUTATIONS:
             marker = " <- full coverage"
 
         print(f"{n:>10,} {prob:>20.10%} {odds_str}{marker}")
+
+    # Show 50% threshold
+    print(f"\n50% threshold: 3,019 attacks (99.8% of all permutations)")
 
 
 if __name__ == "__main__":
