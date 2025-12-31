@@ -7,13 +7,16 @@ A PvP lottery-style game where whales deposit large reserves and piranhas attack
 
 ### Whales
 - Minimum deposit: $1,000
-- Fund the game reserve
-- Single whale deposit starts the game
+- Fund the game reserve (single shared pool)
+- Multiple whales can deposit into the same pool
+- First whale deposit starts the game
+- Profit/loss shared proportionally based on deposit percentage
 
 ### Piranhas
 - Cost per attack: $0.10
 - Submit 4-digit non-repeating attacks
 - Each digit: 1-9 inclusive
+- No per-piranha limit (can attack as many permutations as desired per cycle)
 
 ## Game Flow
 
@@ -73,9 +76,43 @@ Examples:
 ### Reserve Balance
 - Funded by whale deposits
 - Depleted by piranha payouts
+- Minimum reserve threshold: $1,000
 
 ### Cycle Duration
 - Fixed: 10 seconds
 
 ### Active State
-- Game runs while reserve has sufficient funds
+- Before each cycle starts, check if reserve >= $1,000
+- If reserve >= $1,000, cycle proceeds normally
+- If reserve < $1,000, game pauses until whales top up
+
+### Empty Cycles
+- If no attacks occur in a cycle, crit is still generated
+- No payouts, no revenue
+- Next cycle begins normally
+
+### Payouts Guaranteed
+- All winning attacks in a cycle are always paid out
+- Revenue is applied before payouts, so net reserve change is always positive at max attacks
+- At $1,000 reserve with max attacks: revenue $1,512 - payout $1,077 = +$435 profit
+- The permutation cap scaling with reserve ensures the game is always solvent
+
+### Whale Withdrawal
+- Deposits are locked for 10 cycles (100 seconds)
+- After lock period, whale can withdraw their share (between cycles)
+- Share = whale_percentage × current_reserve
+- Withdrawal not allowed if it would drop reserve below $1,000
+- Example: Whale deposited $1,000 of $5,000 pool (20%), reserve now $6,000 → withdraws $1,200
+
+### Profit Sharing
+- Each whale owns a percentage of the pool based on their deposit
+- Percentage = whale_deposit / total_deposits_at_time_of_deposit
+- Profits and losses affect the pool; whale's share floats with pool value
+- New deposits dilute existing whale percentages proportionally
+
+Example:
+1. Whale A deposits $1,000 → owns 100% of $1,000 pool
+2. Whale B deposits $4,000 → A owns 20%, B owns 80% of $5,000 pool
+3. Pool grows to $6,000 from piranha attacks
+4. Whale A's share: 20% × $6,000 = $1,200
+5. Whale B's share: 80% × $6,000 = $4,800
