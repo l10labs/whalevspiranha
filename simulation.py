@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """
-Whale vs Piranha - Game Simulation
+Whale vs Piranha - Game Simulation (Highly Optimized)
 
-Simulates 1000 runs of:
-- 1 whale with $1,000 reserve
-- 100 random piranha attacks per cycle
-- 1000 cycles per run
-- 60 seconds per cycle (for time-based calculations)
+Simulates entire runs at once using aggregate random sampling.
 """
 
 import random
-from statistics import mean, median, stdev
+from statistics import mean, stdev
+import math
 
 # =============================================================================
 # GAME PARAMETERS
@@ -18,110 +15,98 @@ from statistics import mean, median, stdev
 
 WHALE_RESERVE = 1000
 ATTACK_COST = 0.10
-ATTACKS_PER_CYCLE = 100
 CYCLES_PER_RUN = 1000
 CYCLE_DURATION_SECONDS = 60
 
 # Simulation parameters
 NUM_SIMULATIONS = 1000
 
-# All possible 4-digit non-repeating permutations from 1-9
-DIGITS = "123456789"
-ALL_PERMUTATIONS = []
-for a in DIGITS:
-    for b in DIGITS:
-        if b == a:
-            continue
-        for c in DIGITS:
-            if c in (a, b):
-                continue
-            for d in DIGITS:
-                if d in (a, b, c):
-                    continue
-                ALL_PERMUTATIONS.append(a + b + c + d)
+# Total permutations: 9 * 8 * 7 * 6 = 3024
+TOTAL_PERMUTATIONS = 3024
 
-TOTAL_PERMUTATIONS = len(ALL_PERMUTATIONS)  # 3024
+# Combo probabilities and payouts
+COMBO_4X_PROB = 1 / 3024
+COMBO_3X_PROB = 5 / 3024
+COMBO_2X_PROB = 36 / 3024
+COMBO_1X_PROB = 294 / 3024
+
+PAYOUT_4X = 100.00
+PAYOUT_3X = 10.00
+PAYOUT_2X = 1.00
+PAYOUT_1X = 0.10
 
 
-def get_combo_type(attack, crit):
-    """Determine combo type for an attack against a crit."""
-    if attack == crit:
-        return "4x"
-    elif attack[:3] == crit[:3]:
-        return "3x"
-    elif attack[:2] == crit[:2]:
-        return "2x"
-    elif attack[0] == crit[0]:
-        return "1x"
-    else:
-        return "0x"
+def sample_normal(mean_val, std_val):
+    """Sample from normal distribution, clamped to non-negative."""
+    return max(0, random.gauss(mean_val, std_val))
 
 
-def get_payout(combo_type):
-    """Get payout for a combo type."""
-    payouts = {"4x": 100.00, "3x": 10.00, "2x": 1.00, "1x": 0.10, "0x": 0.00}
-    return payouts[combo_type]
-
-
-def simulate_cycle(num_attacks):
+def simulate_run_aggregate(num_cycles, attacks_per_cycle):
     """
-    Simulate a single cycle with random attacks.
-    Returns (revenue, payout, combo_counts)
+    Simulate an entire run by treating the total attacks as one big sample.
+
+    Total attacks across all cycles = num_cycles * attacks_per_cycle
+    We sample how many of those hit each combo type.
     """
-    # Generate random crit
-    crit = random.choice(ALL_PERMUTATIONS)
+    total_attacks = num_cycles * attacks_per_cycle
 
-    # Generate random attacks (with replacement - same permutation can be attacked multiple times)
-    attacks = random.choices(ALL_PERMUTATIONS, k=num_attacks)
+    # Expected hits for each combo type
+    exp_4x = total_attacks * COMBO_4X_PROB
+    exp_3x = total_attacks * COMBO_3X_PROB
+    exp_2x = total_attacks * COMBO_2X_PROB
+    exp_1x = total_attacks * COMBO_1X_PROB
 
-    revenue = num_attacks * ATTACK_COST
-    total_payout = 0.0
-    combo_counts = {"4x": 0, "3x": 0, "2x": 0, "1x": 0, "0x": 0}
+    # Standard deviations (binomial)
+    std_4x = math.sqrt(total_attacks * COMBO_4X_PROB * (1 - COMBO_4X_PROB))
+    std_3x = math.sqrt(total_attacks * COMBO_3X_PROB * (1 - COMBO_3X_PROB))
+    std_2x = math.sqrt(total_attacks * COMBO_2X_PROB * (1 - COMBO_2X_PROB))
+    std_1x = math.sqrt(total_attacks * COMBO_1X_PROB * (1 - COMBO_1X_PROB))
 
-    for attack in attacks:
-        combo = get_combo_type(attack, crit)
-        combo_counts[combo] += 1
-        total_payout += get_payout(combo)
+    # Sample hits from normal approximation
+    hits_4x = sample_normal(exp_4x, std_4x)
+    hits_3x = sample_normal(exp_3x, std_3x)
+    hits_2x = sample_normal(exp_2x, std_2x)
+    hits_1x = sample_normal(exp_1x, std_1x)
 
-    return revenue, total_payout, combo_counts
-
-
-def simulate_run(num_cycles, attacks_per_cycle):
-    """
-    Simulate a full run of multiple cycles.
-    Returns total profit and combo statistics.
-    """
-    total_revenue = 0.0
-    total_payout = 0.0
-    total_combos = {"4x": 0, "3x": 0, "2x": 0, "1x": 0, "0x": 0}
-
-    for _ in range(num_cycles):
-        revenue, payout, combos = simulate_cycle(attacks_per_cycle)
-        total_revenue += revenue
-        total_payout += payout
-        for combo, count in combos.items():
-            total_combos[combo] += count
+    # Calculate totals
+    total_revenue = total_attacks * ATTACK_COST
+    total_payout = (
+        hits_4x * PAYOUT_4X
+        + hits_3x * PAYOUT_3X
+        + hits_2x * PAYOUT_2X
+        + hits_1x * PAYOUT_1X
+    )
 
     profit = total_revenue - total_payout
+
+    return profit, hits_4x
+
+
+def run_simulation_for_attack_count(attacks_per_cycle):
+    """Run simulation for a specific attack count and return summary stats."""
+    profits = []
+    counts_4x = []
+
+    for _ in range(NUM_SIMULATIONS):
+        profit, count_4x = simulate_run_aggregate(CYCLES_PER_RUN, attacks_per_cycle)
+        profits.append(profit)
+        counts_4x.append(count_4x)
+
     return {
-        "revenue": total_revenue,
-        "payout": total_payout,
-        "profit": profit,
-        "combos": total_combos,
+        "attacks": attacks_per_cycle,
+        "avg_profit": mean(profits),
+        "std_profit": stdev(profits),
+        "min_profit": min(profits),
+        "max_profit": max(profits),
+        "losing_runs": sum(1 for p in profits if p < 0),
+        "avg_4x": mean(counts_4x),
     }
 
 
 def main():
-    print("=" * 70)
+    print("=" * 90)
     print("WHALE VS PIRANHA - SIMULATION")
-    print("=" * 70)
-
-    print(f"\nSimulation Parameters:")
-    print(f"  Whale Reserve:      ${WHALE_RESERVE:,}")
-    print(f"  Attacks per Cycle:  {ATTACKS_PER_CYCLE}")
-    print(f"  Cycles per Run:     {CYCLES_PER_RUN:,}")
-    print(f"  Cycle Duration:     {CYCLE_DURATION_SECONDS} seconds")
-    print(f"  Number of Runs:     {NUM_SIMULATIONS:,}")
+    print("=" * 90)
 
     # Time calculations
     total_seconds = CYCLES_PER_RUN * CYCLE_DURATION_SECONDS
@@ -129,93 +114,81 @@ def main():
     total_hours = total_minutes / 60
     total_days = total_hours / 24
 
-    print(f"\nTime per Run:")
+    print(f"\nSimulation Parameters:")
+    print(f"  Whale Reserve:      ${WHALE_RESERVE:,}")
+    print(f"  Cycles per Run:     {CYCLES_PER_RUN:,}")
+    print(f"  Cycle Duration:     {CYCLE_DURATION_SECONDS} seconds")
+    print(f"  Number of Runs:     {NUM_SIMULATIONS:,}")
+    print(f"  Time per Run:       {total_hours:.2f} hours ({total_days:.2f} days)")
+
+    attack_counts = [100, 500, 1000, 5000, 10000]
+
+    print(f"\nRunning simulations for attack counts: {attack_counts}")
+    print("-" * 90)
+
+    all_results = []
+    for attacks in attack_counts:
+        print(f"  Simulating {attacks:,} attacks per cycle...")
+        result = run_simulation_for_attack_count(attacks)
+        all_results.append(result)
+
+    # Print summary table
+    print(f"\n{'=' * 90}")
+    print("RESULTS SUMMARY (per run = {:.2f} hours)".format(total_hours))
+    print("=" * 90)
+
     print(
-        f"  {total_seconds:,} seconds = {total_minutes:,.1f} minutes = {total_hours:,.2f} hours = {total_days:,.2f} days"
+        f"\n{'Attacks':>10} {'Avg Profit':>14} {'Std Dev':>12} {'Min':>14} {'Max':>14} {'Losing':>10} {'Avg 4x':>8}"
     )
+    print("-" * 90)
 
-    print(f"\nRunning {NUM_SIMULATIONS:,} simulations...")
+    for r in all_results:
+        losing_pct = r["losing_runs"] / NUM_SIMULATIONS * 100
+        print(
+            f"{r['attacks']:>10,} ${r['avg_profit']:>+12,.2f} ${r['std_profit']:>10,.2f} ${r['min_profit']:>+12,.2f} ${r['max_profit']:>+12,.2f} {losing_pct:>9.2f}% {r['avg_4x']:>7.1f}"
+        )
 
-    # Run simulations
-    results = []
-    for i in range(NUM_SIMULATIONS):
-        result = simulate_run(CYCLES_PER_RUN, ATTACKS_PER_CYCLE)
-        results.append(result)
-        if (i + 1) % 100 == 0:
-            print(f"  Completed {i + 1:,} runs...")
-
-    # Aggregate results
-    profits = [r["profit"] for r in results]
-    revenues = [r["revenue"] for r in results]
-    payouts = [r["payout"] for r in results]
-
-    total_4x = [r["combos"]["4x"] for r in results]
-    total_3x = [r["combos"]["3x"] for r in results]
-    total_2x = [r["combos"]["2x"] for r in results]
-    total_1x = [r["combos"]["1x"] for r in results]
-
-    # Calculate statistics
-    avg_profit = mean(profits)
-    med_profit = median(profits)
-    std_profit = stdev(profits)
-    min_profit = min(profits)
-    max_profit = max(profits)
-
-    # Count losing runs
-    losing_runs = sum(1 for p in profits if p < 0)
-
-    print(f"\n{'=' * 70}")
-    print("RESULTS (per run = {:.2f} hours)".format(total_hours))
-    print("=" * 70)
-
-    print(f"\nProfit Statistics (per {CYCLES_PER_RUN:,} cycles):")
-    print(f"  Average Profit:     ${avg_profit:+,.2f}")
-    print(f"  Median Profit:      ${med_profit:+,.2f}")
-    print(f"  Std Deviation:      ${std_profit:,.2f}")
-    print(f"  Min Profit:         ${min_profit:+,.2f}")
-    print(f"  Max Profit:         ${max_profit:+,.2f}")
-    print(
-        f"  Losing Runs:        {losing_runs} / {NUM_SIMULATIONS} ({losing_runs / NUM_SIMULATIONS * 100:.2f}%)"
-    )
-
-    print(f"\nCombo Statistics (per run):")
-    print(
-        f"  4x hits: avg={mean(total_4x):.2f}, min={min(total_4x)}, max={max(total_4x)}"
-    )
-    print(
-        f"  3x hits: avg={mean(total_3x):.2f}, min={min(total_3x)}, max={max(total_3x)}"
-    )
-    print(
-        f"  2x hits: avg={mean(total_2x):.2f}, min={min(total_2x)}, max={max(total_2x)}"
-    )
-    print(
-        f"  1x hits: avg={mean(total_1x):.2f}, min={min(total_1x)}, max={max(total_1x)}"
-    )
-
-    # Time-based profit calculations
-    profit_per_cycle = avg_profit / CYCLES_PER_RUN
-    profit_per_minute = profit_per_cycle * (60 / CYCLE_DURATION_SECONDS)
-    profit_per_hour = profit_per_minute * 60
-    profit_per_day = profit_per_hour * 24
-
-    print(f"\n{'=' * 70}")
+    # Time-based profit table
+    print(f"\n{'=' * 90}")
     print("TIME-BASED PROFIT (Average)")
-    print("=" * 70)
-    print(f"  Per Cycle ({CYCLE_DURATION_SECONDS}s):    ${profit_per_cycle:+,.4f}")
-    print(f"  Per Minute:          ${profit_per_minute:+,.4f}")
-    print(f"  Per Hour:            ${profit_per_hour:+,.2f}")
-    print(f"  Per Day:             ${profit_per_day:+,.2f}")
+    print("=" * 90)
 
-    # ROI calculations
-    roi_per_hour = (profit_per_hour / WHALE_RESERVE) * 100
-    roi_per_day = (profit_per_day / WHALE_RESERVE) * 100
+    print(
+        f"\n{'Attacks':>10} {'Per Cycle':>14} {'Per Minute':>14} {'Per Hour':>14} {'Per Day':>14}"
+    )
+    print("-" * 90)
 
-    print(f"\n{'=' * 70}")
+    for r in all_results:
+        profit_per_cycle = r["avg_profit"] / CYCLES_PER_RUN
+        profit_per_minute = profit_per_cycle * (60 / CYCLE_DURATION_SECONDS)
+        profit_per_hour = profit_per_minute * 60
+        profit_per_day = profit_per_hour * 24
+
+        print(
+            f"{r['attacks']:>10,} ${profit_per_cycle:>+12,.2f} ${profit_per_minute:>+12,.2f} ${profit_per_hour:>+12,.2f} ${profit_per_day:>+12,.2f}"
+        )
+
+    # ROI table
+    print(f"\n{'=' * 90}")
     print("RETURN ON INVESTMENT (on ${:,} reserve)".format(WHALE_RESERVE))
-    print("=" * 70)
-    print(f"  ROI per Hour:        {roi_per_hour:+,.2f}%")
-    print(f"  ROI per Day:         {roi_per_day:+,.2f}%")
-    print(f"  ROI per Year:        {roi_per_day * 365:+,.2f}%")
+    print("=" * 90)
+
+    print(f"\n{'Attacks':>10} {'ROI/Hour':>14} {'ROI/Day':>14} {'ROI/Year':>16}")
+    print("-" * 90)
+
+    for r in all_results:
+        profit_per_cycle = r["avg_profit"] / CYCLES_PER_RUN
+        profit_per_minute = profit_per_cycle * (60 / CYCLE_DURATION_SECONDS)
+        profit_per_hour = profit_per_minute * 60
+        profit_per_day = profit_per_hour * 24
+
+        roi_per_hour = (profit_per_hour / WHALE_RESERVE) * 100
+        roi_per_day = (profit_per_day / WHALE_RESERVE) * 100
+        roi_per_year = roi_per_day * 365
+
+        print(
+            f"{r['attacks']:>10,} {roi_per_hour:>+13.2f}% {roi_per_day:>+13.2f}% {roi_per_year:>+15,.2f}%"
+        )
 
 
 if __name__ == "__main__":
