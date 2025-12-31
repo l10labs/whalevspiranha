@@ -62,14 +62,15 @@ Example: Crit attack = "2345"
 
 ### Permutation Cap
 - Maximum attacks per permutation per cycle: Step function
-- Increments by 5 for every $1,000 deposited
-- Formula: `floor(whale_reserve / 1,000) * 5`
+- Base cap of 5 for reserves $1,000-$5,999
+- Increments by 5 for every $1,000 above $5,000
+- Formula: `5 + floor(max(0, whale_reserve - 5,000) / 1,000) * 5`
 
 Examples:
-- $1,000-$1,999 reserve = 5 max per permutation
-- $2,000-$2,999 reserve = 10 max per permutation
-- $3,000-$3,999 reserve = 15 max per permutation
-- $5,000-$5,999 reserve = 25 max per permutation
+- $1,000-$5,999 reserve = 5 max per permutation
+- $6,000-$6,999 reserve = 10 max per permutation
+- $7,000-$7,999 reserve = 15 max per permutation
+- $10,000-$10,999 reserve = 30 max per permutation
 
 ## Game State
 
@@ -94,8 +95,9 @@ Examples:
 ### Payouts Guaranteed
 - All winning attacks in a cycle are always paid out
 - Revenue is applied before payouts, so net reserve change is always positive at max attacks
-- At $1,000 reserve with max attacks: revenue $1,512 - payout $1,077 = +$435 profit
-- The permutation cap scaling with reserve ensures the game is always solvent
+- The conservative permutation cap (starting at $5,000) provides a large buffer
+- At $1,000-$5,999 reserve with max attacks (cap=5): revenue $1,512 - payout $1,077 = +$435 profit
+- The permutation cap scaling ensures the game is always solvent
 
 ### Whale Withdrawal
 - Deposits are locked for 10 cycles (100 seconds)
